@@ -1,0 +1,22 @@
+{
+  "name": "vehicle-service-centre-management-system",
+  "version": "1.0.0",
+  "description": "Vehicle Service Centre Management System with Customers, Vehicles, Services, and Payments CRUD",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test_crud.js"
+  },
+  "keywords": [
+    "vehicle-management",
+    "service-centre",
+    "mechanic",
+    "appointments",
+    "billing",
+    "sqlite",
+    "crud"
+  ],
+  "author": "Apex Auto Care Informatics",
+  "license": "MIT"
+}

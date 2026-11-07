@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Management - Vehicle Service Centre</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="app-sidebar">
+    <div class="brand-section">
+      <img src="/images/damodar_reddy.jpg" alt="Damodar Reddy" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 6px rgba(0,0,0,0.3); flex-shrink: 0;">
+      <div class="brand-text">
+        <h1 style="font-size: 0.85rem; line-height: 1.2;">DAMODAR REDDY'S</h1>
+        <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 600;">VEHICLE SERVICE CENTRE</span>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-section-title">Overview</li>
+      <li><a href="/index.html"><span>📊</span> <span>Dashboard</span></a></li>
+
+      <li class="nav-section-title">Management Modules</li>
+      <li><a href="/customers.html" class="active"><span>👤</span> <span>Customers</span></a></li>
+      <li><a href="/vehicles.html"><span>🚘</span> <span>Vehicles</span></a></li>
+      <li><a href="/services.html"><span>🔧</span> <span>Services & Repairs</span></a></li>
+      <li><a href="/payments.html"><span>💳</span> <span>Payments & Invoices</span></a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="dot"></span>
+        <span>SQLite Connected</span>
+      </div>
+      <small>v1.0</small>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title-box">
+        <h2>Customer Management (Table: CUSTOMERS)</h2>
+        <p>Register new customers, look up contact profiles, and update billing addresses</p>
+      </div>
+      <div class="header-actions">
+        <button id="btnOpenAddCustomer" class="btn btn-accent">
+          <span>➕</span> Add Customer
+        </button>
+      </div>
+    </header>
+
+    <div class="page-container">
+
+      <!-- Customer Directory Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span>👤</span> Registered Customer Directory</h3>
+          <span id="customerCountBadge" class="badge" style="background:#e0f2fe; color:#0369a1;">0 Customers</span>
+        </div>
+
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="customerSearchInput" placeholder="Search customer name, phone, or email...">
+            </div>
+            <button id="btnResetSearch" class="btn btn-secondary">Reset</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer Name</th>
+                  <th>Phone Number</th>
+                  <th>Email Address</th>
+                  <th>Address</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customersTableBody">
+                <tr><td colspan="6" style="text-align:center; padding: 20px;">Loading customer database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Add Customer Modal -->
+  <div class="modal-overlay" id="addCustomerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span>➕</span> Register New Customer</h3>
+        <button class="modal-close" onclick="closeModal('addCustomerModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addCustomerForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            <div class="form-group">
+              <label>Phone Number <span class="req">*</span></label>
+              <input type="tel" name="phone" class="form-control" placeholder="e.g. +91 98765 11221" required>
+            </div>
+            <div class="form-group form-full">
+              <label>Email Address</label>
+              <input type="email" name="email" class="form-control" placeholder="e.g. rahul@example.com">
+            </div>
+            <div class="form-group form-full">
+              <label>Address</label>
+              <input type="text" name="address" class="form-control" placeholder="Street, City, Postal Code">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addCustomerModal')">Cancel</button>
+            <button type="submit" class="btn btn-accent">Save Customer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Customer Modal -->
+  <div class="modal-overlay" id="editCustomerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span>✏️</span> Edit Customer Details</h3>
+        <button class="modal-close" onclick="closeModal('editCustomerModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editCustomerForm">
+          <input type="hidden" id="editCustomerId" name="customer_id">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <input type="text" id="editCustomerName" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>Phone Number <span class="req">*</span></label>
+              <input type="tel" id="editCustomerPhone" name="phone" class="form-control" required>
+            </div>
+            <div class="form-group form-full">
+              <label>Email Address</label>
+              <input type="email" id="editCustomerEmail" name="email" class="form-control">
+            </div>
+            <div class="form-group form-full">
+              <label>Address</label>
+              <input type="text" id="editCustomerAddress" name="address" class="form-control">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('editCustomerModal')">Cancel</button>
+            <button type="submit" class="btn btn-accent">Update Customer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    let customersList = [];
+
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    document.getElementById('btnOpenAddCustomer').addEventListener('click', () => {
+      document.getElementById('addCustomerForm').reset();
+      openModal('addCustomerModal');
+    });
+
+    async function loadCustomers() {
+      const search = document.getElementById('customerSearchInput').value.trim();
+      const url = new URL('/api/customers', window.location.origin);
+      if (search) url.searchParams.set('search', search);
+
+      try {
+        const res = await fetch(url.toString());
+        const json = await res.json();
+        const tbody = document.getElementById('customersTableBody');
+
+        if (!json.success || !json.data || json.data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px;">No customer records found.</td></tr>';
+          document.getElementById('customerCountBadge').textContent = '0 Customers';
+          return;
+        }
+
+        customersList = json.data;
+        document.getElementById('customerCountBadge').textContent = `${customersList.length} Customers`;
+
+        tbody.innerHTML = customersList.map(c => `
+          <tr>
+            <td><strong>#${c.customer_id}</strong></td>
+            <td><strong>${c.name}</strong></td>
+            <td>${c.phone}</td>
+            <td>${c.email || '—'}</td>
+            <td>${c.address || '—'}</td>
+            <td>
+              <div class="action-group">
+                <button class="btn-sm btn-edit" onclick="editCustomer(${c.customer_id})">✏️ Edit</button>
+                <button class="btn-sm btn-del" onclick="deleteCustomer(${c.customer_id}, '${c.name.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Error fetching customers:', err);
+        showToast('Error loading customers', 'error');
+      }
+    }
+
+    // Add Customer Form Submit
+    document.getElementById('addCustomerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/api/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Customer ${json.data.name} added successfully!`, 'success');
+          closeModal('addCustomerModal');
+          loadCustomers();
+        } else {
+          showToast(json.error || 'Failed to save customer', 'error');
+        }
+      } catch (err) {
+        showToast('Network error while saving customer', 'error');
+      }
+    });
+
+    // Edit Customer
+    function editCustomer(id) {
+      const c = customersList.find(item => item.customer_id === id);
+      if (!c) return;
+      document.getElementById('editCustomerId').value = c.customer_id;
+      document.getElementById('editCustomerName').value = c.name;
+      document.getElementById('editCustomerPhone').value = c.phone;
+      document.getElementById('editCustomerEmail').value = c.email || '';
+      document.getElementById('editCustomerAddress').value = c.address || '';
+      openModal('editCustomerModal');
+    }
+
+    // Edit Customer Form Submit
+    document.getElementById('editCustomerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editCustomerId').value;
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch(`/api/customers/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Customer ${json.data.name} updated!`, 'success');
+          closeModal('editCustomerModal');
+          loadCustomers();
+        } else {
+          showToast(json.error || 'Failed to update customer', 'error');
+        }
+      } catch (err) {
+        showToast('Error updating customer', 'error');
+      }
+    });
+
+    // Delete Customer
+    async function deleteCustomer(id, name) {
+      if (!confirm(`Warning: Deleting customer "${name}" will also delete all associated vehicles, services, and payment records.\n\nConfirm deletion?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/customers/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Customer deleted successfully`, 'success');
+          loadCustomers();
+        } else {
+          showToast(json.error || 'Failed to delete customer', 'error');
+        }
+      } catch (err) {
+        showToast('Error deleting customer', 'error');
+      }
+    }
+
+    // Live search debouncing
+    let searchTimer;
+    document.getElementById('customerSearchInput').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(loadCustomers, 250);
+    });
+
+    document.getElementById('btnResetSearch').addEventListener('click', () => {
+      document.getElementById('customerSearchInput').value = '';
+      loadCustomers();
+    });
+
+    loadCustomers();
+  </script>
+</body>
+</html>

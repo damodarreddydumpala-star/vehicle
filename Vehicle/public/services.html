@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Operations & Repairs - Vehicle Service Centre</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="app-sidebar">
+    <div class="brand-section">
+      <img src="/images/damodar_reddy.jpg" alt="Damodar Reddy" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 6px rgba(0,0,0,0.3); flex-shrink: 0;">
+      <div class="brand-text">
+        <h1 style="font-size: 0.85rem; line-height: 1.2;">DAMODAR REDDY'S</h1>
+        <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 600;">VEHICLE SERVICE CENTRE</span>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-section-title">Overview</li>
+      <li><a href="/index.html"><span>📊</span> <span>Dashboard</span></a></li>
+
+      <li class="nav-section-title">Management Modules</li>
+      <li><a href="/customers.html"><span>👤</span> <span>Customers</span></a></li>
+      <li><a href="/vehicles.html"><span>🚘</span> <span>Vehicles</span></a></li>
+      <li><a href="/services.html" class="active"><span>🔧</span> <span>Services & Repairs</span></a></li>
+      <li><a href="/payments.html"><span>💳</span> <span>Payments & Invoices</span></a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="dot"></span>
+        <span>SQLite Connected</span>
+      </div>
+      <small>v1.0</small>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title-box">
+        <h2>Services & Repairs (Table: SERVICES)</h2>
+        <p>Book service appointments, allow mechanics to update progress, and set labor charges</p>
+      </div>
+      <div class="header-actions">
+        <button id="btnOpenBookService" class="btn btn-accent">
+          <span>➕</span> Book Service Appointment
+        </button>
+      </div>
+    </header>
+
+    <div class="page-container">
+
+      <!-- Services Table Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span>🔧</span> Clinical Bay Service Queue</h3>
+          <span id="serviceCountBadge" class="badge" style="background:#e0f2fe; color:#0369a1;">0 Tickets</span>
+        </div>
+
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="serviceSearchInput" placeholder="Search by vehicle plate, customer, or service type...">
+            </div>
+
+            <div class="filter-group">
+              <select id="statusFilter" class="select-input">
+                <option value="All">All Statuses</option>
+                <option value="Booked">Booked</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+              <button id="btnResetServices" class="btn btn-secondary">Reset</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ticket #</th>
+                  <th>Vehicle Info</th>
+                  <th>Customer Owner</th>
+                  <th>Service Type</th>
+                  <th>Scheduled Date</th>
+                  <th>Service Charge</th>
+                  <th>Progress Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="servicesTableBody">
+                <tr><td colspan="8" style="text-align:center; padding: 20px;">Loading service records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Book Service Modal -->
+  <div class="modal-overlay" id="bookServiceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span>📅</span> Book Service Appointment</h3>
+        <button class="modal-close" onclick="closeModal('bookServiceModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="bookServiceForm">
+          <div class="form-grid">
+            <div class="form-group form-full">
+              <label>Select Registered Vehicle <span class="req">*</span></label>
+              <select id="serviceVehicleSelect" name="vehicle_id" class="form-control" required>
+                <option value="">Loading vehicles...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Service Type <span class="req">*</span></label>
+              <select name="service_type" class="form-control" required>
+                <option value="Periodic Maintenance Service">Periodic Maintenance Service</option>
+                <option value="Engine Oil & Filter Change">Engine Oil & Filter Change</option>
+                <option value="Brake System Overhaul">Brake System Overhaul</option>
+                <option value="AC Cooling & Refrigerant">AC Cooling & Refrigerant</option>
+                <option value="Suspension & Steering Overhaul">Suspension & Steering Overhaul</option>
+                <option value="Electrical & Battery Diagnostics">Electrical & Battery Diagnostics</option>
+                <option value="Wheel Balancing & Alignment">Wheel Balancing & Alignment</option>
+                <option value="Comprehensive Full Inspection">Comprehensive Full Inspection</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Scheduled Service Date <span class="req">*</span></label>
+              <input type="date" id="bookServiceDate" name="service_date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Initial Service Charge (₹)</label>
+              <input type="number" name="service_charge" class="form-control" placeholder="0.00" value="1500" step="50">
+            </div>
+
+            <div class="form-group">
+              <label>Initial Status</label>
+              <select name="status" class="form-control">
+                <option value="Booked" selected>Booked</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
+            <div class="form-group form-full">
+              <label>Customer Complaint / Description</label>
+              <textarea name="description" class="form-control" placeholder="Symptoms reported by customer, noise, mileage, work requested..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('bookServiceModal')">Cancel</button>
+            <button type="submit" class="btn btn-accent">Confirm Booking</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mechanic Progress Update Modal -->
+  <div class="modal-overlay" id="mechanicProgressModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span>🔧</span> Mechanic Service Progress & Charge Update</h3>
+        <button class="modal-close" onclick="closeModal('mechanicProgressModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="mechanicProgressForm">
+          <input type="hidden" id="progressServiceId" name="service_id">
+          
+          <div style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+            <p><strong>Ticket ID:</strong> <span id="progressTicketLabel">#0</span></p>
+            <p><strong>Vehicle:</strong> <span id="progressVehicleLabel">—</span></p>
+            <p><strong>Customer:</strong> <span id="progressCustomerLabel">—</span></p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Update Status <span class="req">*</span></label>
+              <select id="progressStatusSelect" name="status" class="form-control" required>
+                <option value="Booked">Booked (Waiting in Bay)</option>
+                <option value="In Progress">In Progress (Mechanic Working)</option>
+                <option value="Completed">Completed (Ready for Delivery)</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Final Service / Labor Charge (₹) <span class="req">*</span></label>
+              <input type="number" id="progressChargeInput" name="service_charge" class="form-control" step="50" required>
+            </div>
+
+            <div class="form-group form-full">
+              <label>Mechanic Work Notes / Action Taken</label>
+              <textarea id="progressDescriptionInput" name="description" class="form-control" placeholder="Parts replaced, fluid top-up, test drive observation..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('mechanicProgressModal')">Cancel</button>
+            <button type="submit" class="btn btn-success">Update Progress & Charge</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    let servicesList = [];
+    document.getElementById('bookServiceDate').value = new Date().toISOString().slice(0, 10);
+
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    document.getElementById('btnOpenBookService').addEventListener('click', () => {
+      document.getElementById('bookServiceForm').reset();
+      document.getElementById('bookServiceDate').value = new Date().toISOString().slice(0, 10);
+      populateVehicleSelect('serviceVehicleSelect');
+      openModal('bookServiceModal');
+    });
+
+    async function loadServices() {
+      const search = document.getElementById('serviceSearchInput').value.trim();
+      const status = document.getElementById('statusFilter').value;
+
+      const url = new URL('/api/services', window.location.origin);
+      if (search) url.searchParams.set('search', search);
+      if (status !== 'All') url.searchParams.set('status', status);
+
+      try {
+        const res = await fetch(url.toString());
+        const json = await res.json();
+        const tbody = document.getElementById('servicesTableBody');
+
+        if (!json.success || !json.data || json.data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px;">No services matching filters.</td></tr>';
+          document.getElementById('serviceCountBadge').textContent = '0 Tickets';
+          return;
+        }
+
+        servicesList = json.data;
+        document.getElementById('serviceCountBadge').textContent = `${servicesList.length} Tickets`;
+
+        tbody.innerHTML = servicesList.map(s => `
+          <tr>
+            <td><strong>#${s.service_id}</strong></td>
+            <td>
+              <code><strong>${s.vehicle_number}</strong></code><br>
+              <small style="color:#64748b;">${s.vehicle_model} (${s.vehicle_type})</small>
+            </td>
+            <td>
+              <strong>${s.customer_name}</strong><br>
+              <small style="color:#64748b;">${s.customer_phone}</small>
+            </td>
+            <td>
+              <strong>${s.service_type}</strong><br>
+              <small style="color:#64748b;">${s.description ? (s.description.slice(0, 45) + '...') : ''}</small>
+            </td>
+            <td>${formatDate(s.service_date)}</td>
+            <td><strong style="color: #0369a1;">${formatCurrency(s.service_charge)}</strong></td>
+            <td>${getServiceStatusBadge(s.status)}</td>
+            <td>
+              <div class="action-group">
+                <button class="btn-sm btn-edit" onclick="openMechanicUpdate(${s.service_id})" title="Update mechanic progress">
+                  🔧 Update
+                </button>
+                <button class="btn-sm btn-del" onclick="deleteService(${s.service_id})" title="Delete ticket">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Error fetching services:', err);
+        showToast('Error loading services', 'error');
+      }
+    }
+
+    // Book Service Form Submit
+    document.getElementById('bookServiceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/api/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Service ticket #${json.data.service_id} booked!`, 'success');
+          closeModal('bookServiceModal');
+          loadServices();
+        } else {
+          showToast(json.error || 'Failed to book service', 'error');
+        }
+      } catch (err) {
+        showToast('Error booking service', 'error');
+      }
+    });
+
+    // Mechanic Progress Modal Open
+    function openMechanicUpdate(id) {
+      const s = servicesList.find(item => item.service_id === id);
+      if (!s) return;
+
+      document.getElementById('progressServiceId').value = s.service_id;
+      document.getElementById('progressTicketLabel').textContent = `#${s.service_id} (${s.service_type})`;
+      document.getElementById('progressVehicleLabel').textContent = `${s.vehicle_number} - ${s.vehicle_model}`;
+      document.getElementById('progressCustomerLabel').textContent = `${s.customer_name} (${s.customer_phone})`;
+      document.getElementById('progressStatusSelect').value = s.status;
+      document.getElementById('progressChargeInput').value = s.service_charge;
+      document.getElementById('progressDescriptionInput').value = s.description || '';
+
+      openModal('mechanicProgressModal');
+    }
+
+    // Mechanic Progress Form Submit
+    document.getElementById('mechanicProgressForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('progressServiceId').value;
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch(`/api/services/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Service ticket #${id} progress updated!`, 'success');
+          closeModal('mechanicProgressModal');
+          loadServices();
+        } else {
+          showToast(json.error || 'Failed to update progress', 'error');
+        }
+      } catch (err) {
+        showToast('Error saving progress update', 'error');
+      }
+    });
+
+    // Delete Service
+    async function deleteService(id) {
+      if (!confirm(`Are you sure you want to delete service ticket #${id}? Associated payments will also be removed.`)) return;
+
+      try {
+        const res = await fetch(`/api/services/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Service ticket #${id} deleted`, 'success');
+          loadServices();
+        } else {
+          showToast(json.error || 'Failed to delete service', 'error');
+        }
+      } catch (err) {
+        showToast('Error deleting service', 'error');
+      }
+    }
+
+    // Filter Listeners
+    document.getElementById('statusFilter').addEventListener('change', loadServices);
+    let sSearchTimer;
+    document.getElementById('serviceSearchInput').addEventListener('input', () => {
+      clearTimeout(sSearchTimer);
+      sSearchTimer = setTimeout(loadServices, 250);
+    });
+
+    document.getElementById('btnResetServices').addEventListener('click', () => {
+      document.getElementById('serviceSearchInput').value = '';
+      document.getElementById('statusFilter').value = 'All';
+      loadServices();
+    });
+
+    loadServices();
+  </script>
+</body>
+</html>

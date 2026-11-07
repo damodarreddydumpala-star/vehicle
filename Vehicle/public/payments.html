@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments & Billing - Vehicle Service Centre</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="app-sidebar">
+    <div class="brand-section">
+      <img src="/images/damodar_reddy.jpg" alt="Damodar Reddy" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 6px rgba(0,0,0,0.3); flex-shrink: 0;">
+      <div class="brand-text">
+        <h1 style="font-size: 0.85rem; line-height: 1.2;">DAMODAR REDDY'S</h1>
+        <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 600;">VEHICLE SERVICE CENTRE</span>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-section-title">Overview</li>
+      <li><a href="/index.html"><span>📊</span> <span>Dashboard</span></a></li>
+
+      <li class="nav-section-title">Management Modules</li>
+      <li><a href="/customers.html"><span>👤</span> <span>Customers</span></a></li>
+      <li><a href="/vehicles.html"><span>🚘</span> <span>Vehicles</span></a></li>
+      <li><a href="/services.html"><span>🔧</span> <span>Services & Repairs</span></a></li>
+      <li><a href="/payments.html" class="active"><span>💳</span> <span>Payments & Invoices</span></a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="dot"></span>
+        <span>SQLite Connected</span>
+      </div>
+      <small>v1.0</small>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title-box">
+        <h2>Billing & Payments Ledger (Table: PAYMENTS)</h2>
+        <p>Admin billing desk to log customer service payments, process UPI/Cash, and issue invoices</p>
+      </div>
+      <div class="header-actions">
+        <button id="btnOpenRecordPayment" class="btn btn-success">
+          <span>💳</span> Log Payment Transaction
+        </button>
+      </div>
+    </header>
+
+    <div class="page-container">
+
+      <!-- Payments Table Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span>💰</span> Service Payments & Transactions</h3>
+          <span id="paymentCountBadge" class="badge" style="background:#dcfce7; color:#15803d;">0 Transactions</span>
+        </div>
+
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="filter-group">
+              <select id="paymentStatusFilter" class="select-input">
+                <option value="All">All Statuses</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
+              </select>
+
+              <select id="paymentMethodFilter" class="select-input">
+                <option value="All">All Methods</option>
+                <option value="UPI">UPI / QR Code</option>
+                <option value="Cash">Cash</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Net Banking">Net Banking</option>
+              </select>
+
+              <button id="btnResetPayments" class="btn btn-secondary">Reset</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Payment ID</th>
+                  <th>Service Ticket</th>
+                  <th>Vehicle & Owner</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Payment Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTableBody">
+                <tr><td colspan="8" style="text-align:center; padding: 20px;">Loading payment transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Record Payment Modal -->
+  <div class="modal-overlay" id="recordPaymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span>💳</span> Record Service Payment</h3>
+        <button class="modal-close" onclick="closeModal('recordPaymentModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="recordPaymentForm">
+          <div class="form-grid">
+            <div class="form-group form-full">
+              <label>Select Service Ticket to Bill <span class="req">*</span></label>
+              <select id="paymentServiceSelect" name="service_id" class="form-control" required>
+                <option value="">Loading services...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Amount to Bill (₹) <span class="req">*</span></label>
+              <input type="number" id="paymentAmountInput" name="amount" class="form-control" step="0.50" placeholder="0.00" required>
+            </div>
+
+            <div class="form-group">
+              <label>Payment Method <span class="req">*</span></label>
+              <select name="payment_method" class="form-control" required>
+                <option value="UPI" selected>UPI / Google Pay / PhonePe</option>
+                <option value="Cash">Cash at Counter</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Net Banking">Net Banking</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Payment Date <span class="req">*</span></label>
+              <input type="date" id="paymentDateInput" name="payment_date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Payment Status <span class="req">*</span></label>
+              <select name="status" class="form-control" required>
+                <option value="Paid" selected>Paid (Settled)</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('recordPaymentModal')">Cancel</button>
+            <button type="submit" class="btn btn-success">Save Payment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Payment Modal -->
+  <div class="modal-overlay" id="editPaymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><span>✏️</span> Edit Payment Status</h3>
+        <button class="modal-close" onclick="closeModal('editPaymentModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editPaymentForm">
+          <input type="hidden" id="editPaymentId" name="payment_id">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Amount (₹) <span class="req">*</span></label>
+              <input type="number" id="editPaymentAmount" name="amount" class="form-control" step="0.50" required>
+            </div>
+            <div class="form-group">
+              <label>Payment Method <span class="req">*</span></label>
+              <select id="editPaymentMethod" name="payment_method" class="form-control" required>
+                <option value="UPI">UPI / QR Code</option>
+                <option value="Cash">Cash</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Net Banking">Net Banking</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Payment Date <span class="req">*</span></label>
+              <input type="date" id="editPaymentDate" name="payment_date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>Status <span class="req">*</span></label>
+              <select id="editPaymentStatus" name="status" class="form-control" required>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('editPaymentModal')">Cancel</button>
+            <button type="submit" class="btn btn-accent">Update Payment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3><span>🧾</span> Service Centre Invoice Receipt</h3>
+        <button class="modal-close" onclick="closeModal('receiptModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="receiptContent" style="font-family: monospace; font-size: 0.95rem;">
+        <!-- Filled dynamically -->
+      </div>
+      <div class="form-actions" style="padding: 12px 20px;">
+        <button class="btn btn-secondary" onclick="closeModal('receiptModal')">Close</button>
+        <button class="btn btn-accent" onclick="window.print()">🖨️ Print Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    let paymentsList = [];
+    document.getElementById('paymentDateInput').value = new Date().toISOString().slice(0, 10);
+
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // Auto-fill amount when service ticket is picked
+    const svcSelect = document.getElementById('paymentServiceSelect');
+    svcSelect.addEventListener('change', () => {
+      const opt = svcSelect.options[svcSelect.selectedIndex];
+      const charge = opt.getAttribute('data-charge');
+      if (charge) {
+        document.getElementById('paymentAmountInput').value = charge;
+      }
+    });
+
+    document.getElementById('btnOpenRecordPayment').addEventListener('click', () => {
+      document.getElementById('recordPaymentForm').reset();
+      document.getElementById('paymentDateInput').value = new Date().toISOString().slice(0, 10);
+      populateServiceSelect('paymentServiceSelect');
+      openModal('recordPaymentModal');
+    });
+
+    async function loadPayments() {
+      const status = document.getElementById('paymentStatusFilter').value;
+      const method = document.getElementById('paymentMethodFilter').value;
+
+      const url = new URL('/api/payments', window.location.origin);
+      if (status !== 'All') url.searchParams.set('status', status);
+      if (method !== 'All') url.searchParams.set('method', method);
+
+      try {
+        const res = await fetch(url.toString());
+        const json = await res.json();
+        const tbody = document.getElementById('paymentsTableBody');
+
+        if (!json.success || !json.data || json.data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px;">No payment records found.</td></tr>';
+          document.getElementById('paymentCountBadge').textContent = '0 Transactions';
+          return;
+        }
+
+        paymentsList = json.data;
+        document.getElementById('paymentCountBadge').textContent = `${paymentsList.length} Transactions`;
+
+        tbody.innerHTML = paymentsList.map(p => `
+          <tr>
+            <td><strong>#PAY-${p.payment_id}</strong></td>
+            <td>
+              <strong>Ticket #${p.service_id}</strong><br>
+              <small style="color:#64748b;">${p.service_type}</small>
+            </td>
+            <td>
+              <code>${p.vehicle_number}</code> (${p.vehicle_model})<br>
+              <small>${p.customer_name}</small>
+            </td>
+            <td><strong style="color: #059669; font-size: 1.05rem;">${formatCurrency(p.amount)}</strong></td>
+            <td><span class="badge" style="background:#f1f5f9; color:#334155;">${p.payment_method}</span></td>
+            <td>${formatDate(p.payment_date)}</td>
+            <td>${getPaymentStatusBadge(p.status)}</td>
+            <td>
+              <div class="action-group">
+                <button class="btn-sm btn-edit" onclick="openReceipt(${p.payment_id})" title="View Receipt">🧾 Receipt</button>
+                <button class="btn-sm btn-edit" onclick="editPayment(${p.payment_id})" title="Update status">✏️</button>
+                <button class="btn-sm btn-del" onclick="deletePayment(${p.payment_id})" title="Delete">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Error loading payments:', err);
+        showToast('Error loading payment transactions', 'error');
+      }
+    }
+
+    // Save Payment Submit
+    document.getElementById('recordPaymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/api/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Payment of ₹${json.data.amount} recorded!`, 'success');
+          closeModal('recordPaymentModal');
+          loadPayments();
+        } else {
+          showToast(json.error || 'Failed to record payment', 'error');
+        }
+      } catch (err) {
+        showToast('Error recording payment', 'error');
+      }
+    });
+
+    // Edit Payment
+    function editPayment(id) {
+      const p = paymentsList.find(item => item.payment_id === id);
+      if (!p) return;
+      document.getElementById('editPaymentId').value = p.payment_id;
+      document.getElementById('editPaymentAmount').value = p.amount;
+      document.getElementById('editPaymentMethod').value = p.payment_method;
+      document.getElementById('editPaymentDate').value = p.payment_date;
+      document.getElementById('editPaymentStatus').value = p.status;
+      openModal('editPaymentModal');
+    }
+
+    // Edit Payment Submit
+    document.getElementById('editPaymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editPaymentId').value;
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch(`/api/payments/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Payment #${id} updated!`, 'success');
+          closeModal('editPaymentModal');
+          loadPayments();
+        } else {
+          showToast(json.error || 'Failed to update payment', 'error');
+        }
+      } catch (err) {
+        showToast('Error updating payment', 'error');
+      }
+    });
+
+    // Delete Payment
+    async function deletePayment(id) {
+      if (!confirm(`Delete payment transaction #PAY-${id}?`)) return;
+
+      try {
+        const res = await fetch(`/api/payments/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Payment record deleted`, 'success');
+          loadPayments();
+        } else {
+          showToast(json.error || 'Failed to delete payment', 'error');
+        }
+      } catch (err) {
+        showToast('Error deleting payment', 'error');
+      }
+    }
+
+    // View Receipt
+    function openReceipt(id) {
+      const p = paymentsList.find(item => item.payment_id === id);
+      if (!p) return;
+
+      const html = `
+        <div style="text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 12px; margin-bottom: 12px;">
+          <h2 style="margin: 0; font-size: 1.2rem; color: #0f172a;">APEX VEHICLE SERVICE CENTRE</h2>
+          <p style="margin: 2px 0; color: #64748b; font-size: 0.8rem;">Auto City Bypass Road, Industrial Zone</p>
+          <p style="margin: 2px 0; color: #64748b; font-size: 0.8rem;">Phone: +91 98765 12345</p>
+        </div>
+        <div style="line-height: 1.8;">
+          <p><strong>Receipt No:</strong> RCPT-00${p.payment_id}</p>
+          <p><strong>Date:</strong> ${formatDate(p.payment_date)}</p>
+          <p><strong>Customer:</strong> ${p.customer_name} (${p.customer_phone})</p>
+          <p><strong>Vehicle:</strong> ${p.vehicle_number} - ${p.vehicle_model}</p>
+          <p><strong>Service:</strong> ${p.service_type}</p>
+          <p><strong>Payment Mode:</strong> ${p.payment_method}</p>
+          <p><strong>Status:</strong> <span style="color: green; font-weight: bold;">${p.status.toUpperCase()}</span></p>
+          <hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0;">
+          <p style="font-size: 1.2rem; display: flex; justify-content: space-between;">
+            <strong>TOTAL AMOUNT PAID:</strong>
+            <strong style="color: #0284c7;">${formatCurrency(p.amount)}</strong>
+          </p>
+        </div>
+        <div style="text-align: center; margin-top: 16px; border-top: 2px dashed #cbd5e1; padding-top: 12px; font-size: 0.78rem; color: #64748b;">
+          Thank you for choosing Apex Auto Care! Safe driving!
+        </div>
+      `;
+      document.getElementById('receiptContent').innerHTML = html;
+      openModal('receiptModal');
+    }
+
+    document.getElementById('paymentStatusFilter').addEventListener('change', loadPayments);
+    document.getElementById('paymentMethodFilter').addEventListener('change', loadPayments);
+    document.getElementById('btnResetPayments').addEventListener('click', () => {
+      document.getElementById('paymentStatusFilter').value = 'All';
+      document.getElementById('paymentMethodFilter').value = 'All';
+      loadPayments();
+    });
+
+    loadPayments();
+  </script>
+</body>
+</html>

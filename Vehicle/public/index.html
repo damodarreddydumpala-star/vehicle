@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAMODAR REDDY'S VEHICLE SERVICE CENTRE MANAGEMENT SYSTEM</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="app-sidebar">
+    <div class="brand-section">
+      <img src="/images/damodar_reddy.jpg" alt="Damodar Reddy" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; box-shadow: 0 2px 6px rgba(0,0,0,0.3); flex-shrink: 0;">
+      <div class="brand-text">
+        <h1 style="font-size: 0.85rem; line-height: 1.2;">DAMODAR REDDY'S</h1>
+        <span style="font-size: 0.68rem; color: #f59e0b; font-weight: 600;">VEHICLE SERVICE CENTRE</span>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-section-title">Overview</li>
+      <li><a href="/index.html" class="active"><span>📊</span> <span>Dashboard</span></a></li>
+
+      <li class="nav-section-title">Management Modules</li>
+      <li><a href="/customers.html"><span>👤</span> <span>Customers</span></a></li>
+      <li><a href="/vehicles.html"><span>🚘</span> <span>Vehicles</span></a></li>
+      <li><a href="/services.html"><span>🔧</span> <span>Services & Repairs</span></a></li>
+      <li><a href="/payments.html"><span>💳</span> <span>Payments & Invoices</span></a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="dot"></span>
+        <span>MySQL Connected</span>
+      </div>
+      <small>v1.0</small>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title-box">
+        <h2>DAMODAR REDDY'S VEHICLE SERVICE CENTRE MANAGEMENT SYSTEM</h2>
+        <p>Comprehensive auto maintenance, repair operations, customer vehicles, and billing desk</p>
+      </div>
+      <div class="header-actions">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 4px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 30px;">
+          <img src="/images/damodar_reddy.jpg" alt="Damodar Reddy" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #0284c7;">
+          <div style="line-height: 1.2;">
+            <div style="font-weight: 700; font-size: 0.85rem; color: #0f172a;">Damodar Reddy</div>
+            <small style="color: #64748b; font-size: 0.72rem;">Managing Director</small>
+          </div>
+        </div>
+        <a href="/services.html" class="btn btn-accent">
+          <span>➕</span> Book New Service
+        </a>
+      </div>
+    </header>
+
+    <div class="page-container">
+
+      <!-- Hero Welcome Profile Banner -->
+      <div class="card" style="margin-bottom: 26px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);">
+        <div class="card-body" style="padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <img src="/images/damodar_reddy.jpg" alt="Damodar Reddy" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #f59e0b; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); flex-shrink: 0;">
+            <div>
+              <div style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 6px;">
+                ⭐ Official Portal
+              </div>
+              <h2 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin-bottom: 4px; letter-spacing: -0.01em;">
+                DAMODAR REDDY'S VEHICLE SERVICE CENTRE MANAGEMENT SYSTEM
+              </h2>
+              <p style="color: #94a3b8; font-size: 0.88rem; margin: 0;">
+                Precision Auto Maintenance, Real-Time Mechanic Progress Tracking, and Automated Invoicing
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="/services.html" class="btn btn-accent" style="padding: 10px 18px;">
+              <span>🔧</span> Service Bay
+            </a>
+            <a href="/payments.html" class="btn btn-success" style="padding: 10px 18px;">
+              <span>💳</span> Billing Desk
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <p>Total Customers</p>
+            <h3 id="stat-customers">0</h3>
+          </div>
+          <div class="stat-icon icon-blue">👤</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <p>Registered Vehicles</p>
+            <h3 id="stat-vehicles">0</h3>
+          </div>
+          <div class="stat-icon icon-amber">🚘</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <p>Active In-Bay Services</p>
+            <h3 id="stat-active-services">0</h3>
+          </div>
+          <div class="stat-icon icon-purple">🔧</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <p>Completed Services</p>
+            <h3 id="stat-completed-services">0</h3>
+          </div>
+          <div class="stat-icon icon-emerald">✅</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <p>Total Revenue Paid</p>
+            <h3 id="stat-revenue">₹0</h3>
+          </div>
+          <div class="stat-icon icon-emerald">💰</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <p>Pending Receivables</p>
+            <h3 id="stat-pending-payments" style="color: #d97706;">₹0</h3>
+          </div>
+          <div class="stat-icon icon-danger">⏳</div>
+        </div>
+      </div>
+
+      <!-- Quick Role Action Hub -->
+      <div class="card" style="margin-bottom: 26px;">
+        <div class="card-header">
+          <h3><span>⚡</span> Operations Role Hub</h3>
+        </div>
+        <div class="card-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+            <div style="padding: 18px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafbfc;">
+              <h4 style="color: #0284c7; margin-bottom: 6px;">👤 Customers & Appointments</h4>
+              <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Register vehicle profiles and book scheduled service inspections.</p>
+              <div style="display: flex; gap: 8px;">
+                <a href="/customers.html" class="btn btn-sm btn-edit">Add Customer</a>
+                <a href="/vehicles.html" class="btn btn-sm btn-edit">Add Vehicle</a>
+              </div>
+            </div>
+
+            <div style="padding: 18px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafbfc;">
+              <h4 style="color: #d97706; margin-bottom: 6px;">🔧 Mechanics & Technicians</h4>
+              <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Inspect vehicles, update repair progress from Booked to In Progress & Completed.</p>
+              <a href="/services.html" class="btn btn-sm btn-accent">Update Service Progress</a>
+            </div>
+
+            <div style="padding: 18px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafbfc;">
+              <h4 style="color: #059669; margin-bottom: 6px;">💼 Admins & Cashiers</h4>
+              <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Finalize service labor charges, log payments via UPI/Cash/Card and settle bills.</p>
+              <a href="/payments.html" class="btn btn-sm btn-success">Record Payment</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Service Queue Table -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span>📋</span> Live Service Queue & Recent Repairs</h3>
+          <a href="/services.html" class="btn btn-sm btn-edit">View All Services</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Service ID</th>
+                  <th>Vehicle Number</th>
+                  <th>Model</th>
+                  <th>Customer</th>
+                  <th>Service Type</th>
+                  <th>Scheduled Date</th>
+                  <th>Labor Charge</th>
+                  <th>Current Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recentServicesBody">
+                <tr><td colspan="9" style="text-align:center; padding: 20px;">Loading service records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/stats');
+        const json = await res.json();
+        if (json.success && json.data) {
+          const d = json.data;
+          document.getElementById('stat-customers').textContent = d.totalCustomers;
+          document.getElementById('stat-vehicles').textContent = d.totalVehicles;
+          document.getElementById('stat-active-services').textContent = d.activeServices;
+          document.getElementById('stat-completed-services').textContent = d.completedServices;
+          document.getElementById('stat-revenue').textContent = formatCurrency(d.totalRevenue);
+          document.getElementById('stat-pending-payments').textContent = formatCurrency(d.pendingPaymentsAmount);
+
+          const tbody = document.getElementById('recentServicesBody');
+          if (!d.recentServices || d.recentServices.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px;">No recent services logged.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = d.recentServices.map(s => `
+            <tr>
+              <td><strong>#${s.service_id}</strong></td>
+              <td><code>${s.vehicle_number}</code></td>
+              <td>${s.vehicle_model}</td>
+              <td><strong>${s.customer_name}</strong></td>
+              <td>${s.service_type}</td>
+              <td>${formatDate(s.service_date)}</td>
+              <td><strong>${formatCurrency(s.service_charge)}</strong></td>
+              <td>${getServiceStatusBadge(s.status)}</td>
+              <td>
+                <a href="/services.html" class="btn-sm btn-edit">Manage</a>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
+        showToast('Error loading dashboard statistics', 'error');
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
